@@ -7,17 +7,20 @@
 */
 void f_pop(stack_t **head, unsigned int counter)
 {
-	stack_t *h;
+	stack_t *node;
 
-	if (*head == NULL)
+	if (!head || !*head)
+		pop_error(head, counter);
+	node = *head;
+	if (!node->next)
 	{
-		fprintf(stderr, "L%d: can't pop an empty stack\n", counter);
-		fclose(bus.file);
-		free(bus.content);
-		free_stack(*head);
-		exit(EXIT_FAILURE);
+		free(*head);
+		*head = NULL;
 	}
-	h = *head;
-	*head = h->next;
-	free(h);
+	else
+	{
+		(*head) = (*head)->next;
+		(*head)->prev = NULL;
+		free(node);
+	}
 }

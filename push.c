@@ -7,31 +7,48 @@
 */
 void f_push(stack_t **head, unsigned int counter)
 {
-	int n, j = 0, flag = 0;
+	stack_t *new_node = NULL, *tail = NULL;
+	size_t idx = 0;
 
-	if (bus.arg)
+	if (!head || !counter)
+		exit(EXIT_FAILURE);
+	if (stack_val.n[idx] == '\0')
+		push_error(head, counter);
+	new_node = malloc(sizeof(stack_t));
+	if (!new_node)
+		malloc_error(head);
+/* make sure string contains only numbers and '-' */
+	while (stack_val.n[idx] != '\0')
 	{
-		if (bus.arg[0] == '-')
-			j++;
-		for (; bus.arg[j] != '\0'; j++)
+		if (isdigit(stack_val.n[idx]) == 0 && stack_val.n[idx] != '-')
+			push_error(head, counter);
+		idx++;
+	}
+	new_node->n = atoi(stack_val.n);
+
+	if (stack_val.qu == 1)
+	{
+		new_node->next = NULL;
+		if (!*head)
 		{
-			if (bus.arg[j] > 57 || bus.arg[j] < 48)
-				flag = 1; }
-		if (flag == 1)
-		{ fprintf(stderr, "L%d: usage: push integer\n", counter);
-			fclose(bus.file);
-			free(bus.content);
-			free_stack(*head);
-			exit(EXIT_FAILURE); }}
+			new_node->prev = NULL;
+			*head = new_node;
+		}
+		else
+		{
+			tail = *head;
+			while (tail->next)
+				tail = tail->next;
+			new_node->prev = tail;
+			tail->next = new_node;
+		}
+	}
 	else
-	{ fprintf(stderr, "L%d: usage: push integer\n", counter);
-		fclose(bus.file);
-		free(bus.content);
-		free_stack(*head);
-		exit(EXIT_FAILURE); }
-	n = atoi(bus.arg);
-	if (bus.lifi == 0)
-		addnode(head, n);
-	else
-		addqueue(head, n);
+	{
+		new_node->prev = NULL;
+		new_node->next = *head;
+		if (*head)
+			(*head)->prev = new_node;
+		*head = new_node;
+	}
 }
